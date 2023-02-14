@@ -1,0 +1,35 @@
+﻿@page "/input"
+@using Microsoft.AspNetCore.Components.Forms
+@inject ILogger<Input> Logger
+
+<PageTitle>Input</PageTitle>
+
+<h1>Counter</h1>
+
+<EditForm Model="@battle" OnSubmit="@HandleSubmit">
+    <InputTextArea id="Unit1String" @bind-Value="battle.Unit1String" rows="10" />
+    <InputTextArea id="Unit1String" @bind-Value="battle.Unit2String" rows="10" />
+    <InputTextArea id="Unit1String" @bind-Value="battle.Result" rows="10" />
+    <button type="submit">Calculate</button>
+</EditForm>
+
+
+@code {
+
+
+
+    private OprBattleSim.Model.Battle battle = new();
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void HandleSubmit()
+    {
+        Logger.LogInformation("HandleSubmit called" + battle.Unit1String);
+        battle.Start();
+
+    }
+}
