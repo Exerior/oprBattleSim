@@ -5,25 +5,33 @@ namespace OprBattleSim.Model
 {
     public class Battle
     {
-        public String Unit1String = "++ Orc Marauders [200pts] ++\r\n\r\nBoss Mob [5] Q3+ D5+ | 200pts | Bad Shot, Furious, Tough(3)\r\n5x CCWs (A3), 5x Pistols (12\", A1)\r\n";
-        public String Unit2String = "++ Orc Marauders [200pts] ++\r\n\r\nBoss Mob [5] Q2+ D5+ | 200pts | Bad Shot, Furious, Tough(3)\r\n5x CCWs (A3), 5x Pistols (12\", A1)\r\n";
+        // Unit/Output UI bindings - This should be seperated in a binding class later on
+        public String Unit1String = "++ Orc Marauders [200pts] ++\r\n\r\nBoss Mob [5] Q4+ D5+ | 200pts | Bad Shot, Furious, Tough(3)\r\n5x CCWs (A3), 5x Pistols (12\", A1)\r\n";
+        public String Unit2String = "++ Orc Marauders [200pts] ++\r\n\r\nBoss Mob [5] Q4+ D5+ | 200pts | Bad Shot, Furious, Tough(3)\r\n5x CCWs (A3), 5x Pistols (12\", A1)\r\n";
         public String Result = "";
-
+        public String Distance = "0";
+        
+        public List<String> ResultLog = new List<String>();
         private Unit Unit1 = new Unit();
         private Unit Unit2 = new Unit();
 
         public void Start()
         {
+            ResultLog.Clear();
             Result = Unit1String + Unit2String;
             Unit1 = new Unit();
             Unit2 = new Unit();
             Unit1.Parse(Unit1String);
             Unit2.Parse(Unit2String);
-            Fight(Unit1, Unit2);
-            Fight(Unit2, Unit1);
+            int fightCount = 100;
+            int winsUnit1 = Fight(Unit1, Unit2, fightCount);
+            int winsUnit2 = Fight(Unit2, Unit1, fightCount);
+
+            Log(@$"Unit 1 won { winsUnit1 + (fightCount - winsUnit2) } times out of {fightCount * 2} fights.");
+            Result = String.Join(ControlChars.NewLine, ResultLog);
         }
 
-        private void Fight(Unit unit1, Unit unit2, int rounds = 100)
+        private int Fight(Unit unit1, Unit unit2, int rounds = 100)
         {
             Log(unit1.Name + " attacks first for " + rounds + " fights");
             int unit1Won = 0;
@@ -63,6 +71,7 @@ namespace OprBattleSim.Model
             Log(" ");
             Log(PrintToughnessDic(countByToughnessUnit1));
             Log(PrintToughnessDic(countByToughnessUnit2));
+            return unit1Won;
         }
 
         private string PrintToughnessDic(Dictionary<int, int> countByToughnessUnit1)
@@ -86,7 +95,7 @@ namespace OprBattleSim.Model
 
         private void Log(string v)
         {
-            Result += v + ControlChars.NewLine;
+            ResultLog.Add(v);
         }
     }
 }

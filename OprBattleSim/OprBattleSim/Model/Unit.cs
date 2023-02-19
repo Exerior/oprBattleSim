@@ -72,9 +72,9 @@ namespace OprBattleSim.Model
         internal void Parse(string unit2String)
         {
             // split the units by doulbe linebreak
-            foreach (String strUnit in unit2String.Split(ControlChars.NewLine + ControlChars.NewLine))
+            foreach (String strUnit in unit2String.Replace("\n\r", "\n").Split("\n\n"))
             {
-                List<String> lines = strUnit.Split(ControlChars.NewLine).ToList();
+                List<String> lines = strUnit.Split("\n").ToList();
                 if (lines.Count < 2)
                 {
                     continue;

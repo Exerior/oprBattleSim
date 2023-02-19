@@ -13,11 +13,10 @@
         {
             foreach (Weapon weapon in Weapons)
             {
-                int q = Unit.Quality;
                 for (int i = 0; i < weapon.Attacks; i++)
                 {
                     int d = Roll();
-                    if (q <= d)
+                    if (Unit.Quality <= d)
                     {
                         // hit !
                         unit2.Hit();
