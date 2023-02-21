@@ -7,10 +7,29 @@
 <h1>Counter</h1>
 
 <EditForm Model="@battle" OnSubmit="@HandleSubmit">
-    <InputTextArea id="Unit1String" @bind-Value="battle.Unit1String" rows="10" />
-    <InputTextArea id="Unit1String" @bind-Value="battle.Unit2String" rows="10" />
-    <InputTextArea id="Unit1String" @bind-Value="battle.Result" rows="10" />
-    <button type="submit">Calculate</button>
+    <fieldset>
+        <legend>Start Epic Battle</legend>
+        <div>
+            <label for="Unit1String">Unit 1:</label>
+            <InputTextArea id="Unit1String" @bind-Value="battle.Unit1String" rows="10" />
+        </div>
+        <div>
+            <label for="Unit1String">Unit 2:</label>
+            <InputTextArea id="Unit1String" @bind-Value="battle.Unit2String" rows="10" />
+        </div>
+        <div>
+            <label for="Distance">Distance</label>
+            <input type="text" @bind="battle.Distance" />
+        </div>
+        <div>
+            <label>&nbsp;</label>
+            <button type="submit">Calculate</button>
+        </div>
+        <div>
+            <label for="Result">Result</label>
+            <InputTextArea id="Result" @bind-Value="battle.Result" rows="10" />
+        </div>
+    </fieldset>
 </EditForm>
 
 

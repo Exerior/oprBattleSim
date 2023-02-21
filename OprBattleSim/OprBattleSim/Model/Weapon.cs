@@ -5,7 +5,8 @@
 
         public int Attacks = 1;
         public int Range = 0; // 0 = melee
-        public int AP = 0; 
+        public int AP = 0;
+        public int AttackQuality = 0;
 
         internal void Parse(string strWeapon)
         {

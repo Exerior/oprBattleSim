@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,7 @@ namespace OprBattleSim.Model
         public int Quality = 0;
         public int Defense = 0;
         public List<Model> Models = new List<Model>();
+        private List<Skill> Skills = new List<Skill>();
 
         // Unit Regexs
         private Regex nameRegex = new Regex("(.*) \\[");
@@ -24,34 +26,55 @@ namespace OprBattleSim.Model
         private Regex weaponRangeRegex = new Regex("([0-9]{1,2})\"");
         private Regex weaponAttacksRegex = new Regex("A([0-9]{1,2})");
 
-        Random rand = new Random();
+        static Random rand = new Random();
 
-        internal void Attack(Unit unit2)
+        internal UnitAttackResult Attack(Unit unit2, int distance)
+        {
+            UnitAttackResult unitAttackResult = new UnitAttackResult();
+            foreach (Model model in Models)
+            {
+                if (model.IsAlive())
+                {
+                    ModelAttackResult mar = model.Attack(unit2, distance);
+                    unitAttackResult.ModelAttackResults.Add(mar);
+                }
+            }
+            return unitAttackResult;
+        }
+
+        internal HitResult TakeHit(int ap = 0, int blast = 1, int deadly = 1)
+        {
+            HitResult hitResult = new HitResult(0);
+            int d = Roll();
+            hitResult.DefenseRollResult = d;
+            if ((d == 6) || (d - ap) >= Defense)
+            {
+                // hit blocked!
+            }
+            else
+            {
+                hitResult.Damage = TakeDamage(deadly);
+            }
+
+            return hitResult;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dmg"></param>
+        /// <returns>0 if this unit is already dead</returns>
+        private int TakeDamage(int dmg)
         {
             foreach (Model model in Models)
             {
-                model.Attack(unit2);
-            }
-        }
-
-        internal void Hit(int ap = 0, int blast = 1, int deadly = 1)
-        {
-            int d = Roll();
-            if (d == 6)
-            {
-                return;
-            }
-            if ((d - ap) >= Defense)
-            {
-                foreach (Model model in Models)
+                if (model.IsAlive())
                 {
-                    if (model.IsAlive())
-                    {
-                        model.CurrentToughness -= deadly;
-                        return;
-                    }                         
+                    model.CurrentToughness -= dmg;
+                    return dmg;
                 }
             }
+            return 0;
         }
 
         private int Roll()
@@ -96,7 +119,7 @@ namespace OprBattleSim.Model
 
                 for (int i = 0; i < ModelCount; i++)
                 {
-                    Model model = new Model();
+                    Model model = new Model(this, skillsStr);
                     model.Unit = this;
                     Models.Add(model);
                 }
@@ -116,6 +139,7 @@ namespace OprBattleSim.Model
                         weapon.Range = weaponRange;
                         if (iModel == ModelCount) iModel = 0;
                         Models[iModel].Weapons.Add(weapon);
+                        iModel++;
                     }
 
                     //weapon.Parse(strWeapon);
@@ -131,26 +155,26 @@ namespace OprBattleSim.Model
             List<string> list = new List<string>();
             bool breakesMode = false;
             string currentWeaponStr = "";
-            foreach(char c in baseStr)
+            foreach (char c in baseStr)
             {
                 currentWeaponStr += c;
-                if(c == '(')
+                if (c == '(')
                 {
                     breakesMode = true;
                     continue;
                 }
-                if(breakesMode && c == ')')
+                if (breakesMode && c == ')')
                 {
                     breakesMode = false;
                     continue;
                 }
-                if(!breakesMode && c == ',')
+                if (!breakesMode && c == ',')
                 {
                     list.Add(currentWeaponStr);
                     currentWeaponStr = ""; // next weapon
                 }
             }
-            if( currentWeaponStr.Length > 0 )
+            if (currentWeaponStr.Length > 0)
             {
                 list.Add(currentWeaponStr);
             }
@@ -184,9 +208,9 @@ namespace OprBattleSim.Model
         internal int AliveModels()
         {
             int alive = 0;
-            foreach(var model in Models)
+            foreach (var model in Models)
             {
-                if(model.IsAlive()) alive++;
+                if (model.IsAlive()) alive += model.CurrentToughness;
             }
             return alive;
         }
